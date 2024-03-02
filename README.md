@@ -1,7 +1,16 @@
-# Handwritten-Digit-Recognition
+# Handwritten Digit Recognition Project
 
 ## Overview
 This project is a Flask-based web application for handwritten digit recognition. It utilizes a neural network model trained on the MNIST dataset to predict digits from user-uploaded images. The application preprocesses images to match the MNIST format (white digits on a black background) before making predictions.
+
+## Introduction
+This Handwritten Digit Recognition Project is a lightweight web application that demonstrates practical machine learning by recognizing handwritten digits from user-uploaded images. Built with Flask, a Python web framework, and leveraging a neural network model trained on the famous MNIST dataset, this application showcases the intersection of web development and artificial intelligence.
+
+The project simplifies the process of digit recognition into an intuitive web interface. Users can upload images in PNG, JPG, or JPEG formats, and the backend, powered by TensorFlow and PIL (Python Imaging Library), preprocesses these images to fit the model's expectations. This preprocessing includes converting images to grayscale, resizing to 28x28 pixels, inverting colors if necessary to match the MNIST training data format, and normalizing pixel values.
+
+Once an image is uploaded, the application applies these preprocessing steps and feeds the image to the pre-trained model, which then predicts the digit. The predicted digit is immediately returned to the user, demonstrating an effective blend of web technology and machine learning for a simple yet powerful application.
+
+Designed to be both a learning tool and a base for further development, this project exemplifies how machine learning models can be integrated into real-world applications, providing insights into the model's behavior and interactions with different types of input data.
 
 ## Installation
 ### Setup

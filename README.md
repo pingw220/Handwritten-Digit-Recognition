@@ -31,4 +31,3 @@ After starting the Flask app, navigate to `http://127.0.0.1:5000/` in your web b
 ## Acknowledgments
 - This project uses the [MNIST dataset](http://yann.lecun.com/exdb/mnist/) for training the digit recognition model.
 - Thanks to TensorFlow and Flask for their fantastic libraries.
-```

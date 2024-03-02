@@ -1,16 +1,12 @@
 from flask import Flask, request, jsonify, render_template_string
 from tensorflow.keras.models import load_model
-from PIL import Image
+from PIL import Image, ImageOps
 import numpy as np
-import io
+import cv2
 
-# Initialize Flask app
 app = Flask(__name__)
+model = load_model('mnist_model.h5')  # Ensure the path is correct
 
-# Load your pre-trained model
-model = load_model('mnist_model.h5')
-
-# Define a route for the homepage
 @app.route('/')
 def home():
     return render_template_string('''
@@ -22,32 +18,41 @@ def home():
         </form>
     ''')
 
-# Define a route for processing uploaded images and making predictions
 @app.route('/predict', methods=['POST'])
 def predict():
     if 'file' not in request.files:
         return jsonify({'error': 'No file part'})
-
     file = request.files['file']
-
     if file.filename == '':
         return jsonify({'error': 'No selected file'})
+    
     if file and (file.filename.endswith('.png') or file.filename.endswith('.jpg') or file.filename.endswith('.jpeg')):
-        # Convert the image to grayscale (MNIST images are grayscale)
-        img.save("debug_preprocessed.png")
-        img = Image.open(file.stream).convert('L')
+        img = Image.open(file.stream).convert('L')  # Convert to grayscale
         
-        # Resize the image to 28x28 pixels (the size used by MNIST)
-        img = img.resize((28, 28))
+        # Convert PIL image to OpenCV format
+        img_cv = np.array(img)
         
-        # Convert the image to a numpy array and normalize it
-        img_array = np.array(img) / 255.0
-        # Reshape the array for the model (adding batch dimension and channel dimension)
-        img_array = img_array.reshape((1, 28, 28, 1))
+        # Apply adaptive thresholding to create a binary image
+        thresh = cv2.adaptiveThreshold(img_cv, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, 
+                                       cv2.THRESH_BINARY, 11, 2)
+        
+        # Invert the image colors to match the MNIST format
+        thresh = cv2.bitwise_not(thresh)
+        
+        # Convert back to PIL image for resizing
+        img_processed = Image.fromarray(thresh)
+        
+        # Resize the image to 28x28 pixels, maintaining aspect ratio
+        img_processed = ImageOps.pad(img_processed, (28, 28), color='black')
+        
+        # Normalize the image
+        img_array = np.array(img_processed).astype('float32') / 255.0
+        img_array = img_array.reshape((1, 28, 28, 1))  # Reshape for the model
+        
         # Make a prediction
         prediction = model.predict(img_array)
         predicted_digit = np.argmax(prediction)
-        img_array = img_array.reshape((1, 28, 28, 1))  # Correct shape for the model
+        
         # Return the prediction
         return jsonify({'predicted_digit': int(predicted_digit)})
 
